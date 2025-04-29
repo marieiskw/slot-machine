@@ -28,7 +28,27 @@ function stopSlot(reelIndex) {
     clearInterval(slotTimers[reelIndex]);
     isSpinning[reelIndex] = false;
   }
+  
 }
+
+const pressKeyboard = (event) => {
+  const key = event.key
+  if (key === ' ') {
+    startSlot();
+  } else if (key === 'Enter') {
+    let idx = 0
+    isSpinning.forEach(spinningFlg => {
+      if(spinningFlg) {
+        stopSlot(idx);
+        return;
+      }
+      idx++;
+    });
+  }
+}
+
+window.addEventListener('keydown', pressKeyboard)
+
 
 document.getElementById('startButton').addEventListener('click', startSlot);
 document
