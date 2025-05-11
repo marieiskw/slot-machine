@@ -6,18 +6,46 @@ const slots = [
 let isSpinning = [false, false, false];
 let slotTimers = [];
 
-const firstSymbols = ['0', '1', '2'];
-const otherSymbols = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
+let firstSymbols = [];
+let secondSymbols = [];
+let thirdSymbols = [];
+
+// 当日の参加者の人数に変更
+const people = 256;
+let hundredsPlace = Math.trunc(people / 100);
+let tensPlace = Math.trunc((people % 100) / 10);
+let onesPlace = Math.trunc((people % 100) % 10);
+
+function resetSlot() {
+  firstSymbols = [];
+  secondSymbols = [];
+  thirdSymbols = [];
+  for(let i = 0; i <= hundredsPlace; i++) {
+    firstSymbols.push(i);
+  }
+  for(let i = 0; i <= 9; i++) {
+    secondSymbols.push(i);
+    thirdSymbols.push(i);
+  }
+}
 
 function startSlot() {
+  resetSlot();
   for (let i = 0; i < slots.length; i++) {
     if (!isSpinning[i]) {
       isSpinning[i] = true;
       slotTimers[i] = setInterval(() => {
-        slots[i].textContent =
-          i === 0
-            ? firstSymbols[Math.floor(Math.random() * firstSymbols.length)]
-            : otherSymbols[Math.floor(Math.random() * otherSymbols.length)];
+          switch(i) {
+            case 0:
+              slots[i].textContent = firstSymbols[Math.floor(Math.random() * firstSymbols.length)];
+              break;
+            case 1:
+              slots[i].textContent = secondSymbols[Math.floor(Math.random() * secondSymbols.length)];
+              break;
+            case 2:
+              slots[i].textContent = thirdSymbols[Math.floor(Math.random() * thirdSymbols.length)];
+              break;
+          }
       }, 40);
     }
   }
@@ -27,8 +55,29 @@ function stopSlot(reelIndex) {
   if (isSpinning[reelIndex]) {
     clearInterval(slotTimers[reelIndex]);
     isSpinning[reelIndex] = false;
-  }
+    
+    // 10の位の数値範囲を再設定
+    if(reelIndex === 0) {
+      const firstDigit = parseInt(slots[0].textContent);
+
+      secondSymbols = [];
+      const maxTens = (firstDigit === hundredsPlace) ? tensPlace : 9;
+      for(let i = 0; i <= maxTens; i++) {
+        secondSymbols.push(i);
+      }
+    }
+      // 1の位の数値範囲を再設定
+      if(reelIndex === 1) {
+        const firstDigit = parseInt(slots[0].textContent);
+        const secondDigit = parseInt(slots[1].textContent);
   
+        thirdSymbols = [];
+        const maxUnit = (firstDigit === hundredsPlace && secondDigit === tensPlace) ? onesPlace : 9;
+        for(let i = 0; i <= maxUnit; i++) {
+          thirdSymbols.push(i);
+        }
+      }
+  }
 }
 
 const pressKeyboard = (event) => {
@@ -48,7 +97,6 @@ const pressKeyboard = (event) => {
 }
 
 window.addEventListener('keydown', pressKeyboard)
-
 
 document.getElementById('startButton').addEventListener('click', startSlot);
 document
