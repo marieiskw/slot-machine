@@ -16,6 +16,11 @@ let hundredsPlace = Math.trunc(people / 100);
 let tensPlace = Math.trunc((people % 100) / 10);
 let onesPlace = Math.trunc((people % 100) % 10);
 
+// 音声ファイル
+const timpani = new Audio('src/sounds/timpani.mp3');
+const rollStop = new Audio('src/sounds/rollStop.mp3');
+const tadah = new Audio('src/sounds/tadah.mp3');
+
 function resetSlot() {
   firstSymbols = [];
   secondSymbols = [];
@@ -31,6 +36,10 @@ function resetSlot() {
 
 function startSlot() {
   resetSlot();
+  
+  timpani.currentTime = 0;
+  timpani.play();
+  
   for (let i = 0; i < slots.length; i++) {
     if (!isSpinning[i]) {
       isSpinning[i] = true;
@@ -55,6 +64,15 @@ function stopSlot(reelIndex) {
   if (isSpinning[reelIndex]) {
     clearInterval(slotTimers[reelIndex]);
     isSpinning[reelIndex] = false;
+
+    if(reelIndex < 2) {
+      rollStop.currentTime = 0;
+      rollStop.play();
+    } else if (reelIndex === 2) {
+      tadah.currentTime = 0;
+      tadah.play();
+      timpani.pause();
+    }
     
     // 10の位の数値範囲を再設定
     if(reelIndex === 0) {
