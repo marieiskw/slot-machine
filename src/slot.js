@@ -10,16 +10,50 @@ let firstSymbols = [];
 let secondSymbols = [];
 let thirdSymbols = [];
 
-// 当日の参加者の人数に変更
-const people = 256;
-let hundredsPlace = Math.trunc(people / 100);
-let tensPlace = Math.trunc((people % 100) / 10);
-let onesPlace = Math.trunc((people % 100) % 10);
-
 // 音声ファイル
 const timpani = new Audio('src/sounds/timpani.mp3');
 const rollStop = new Audio('src/sounds/rollStop.mp3');
 const tadah = new Audio('src/sounds/tadah.mp3');
+
+// 当日の参加者の人数に変更
+const people = 230;
+let hundredsPlace = Math.floor(people / 100);
+let tensPlace = Math.floor((people % 100) / 10);
+let onesPlace = Math.floor(people % 10);
+
+// 既出の当選番号
+const usedNumbers = new Set(['000']);
+
+// 重複チェック用
+function getExcludedUnits(firstDigit, secondDigit) {
+  const excluded = [];
+
+  const firstStr = String(firstDigit).padStart(1, '0');
+  const secondStr = String(secondDigit).padStart(1, '0');
+
+  usedNumbers.forEach(num => {
+    const h = num.charAt(0)
+    const t = num.charAt(1);
+    const o = parseInt(num.charAt(2))
+    if(firstStr === h && secondStr === t) {
+      excluded.push(o);
+    }
+  })
+
+  return excluded;
+}
+
+// 10の位の数字が有効かチェック
+function getValidTens(firstDigit) {
+  const validNum = [];
+  for(let i = 0; i <= 9; i++) {
+    const excluded = getExcludedUnits(firstDigit, i);
+    if(excluded.length < 10) {
+      validNum.push(i);
+    }
+  }
+  return validNum;
+}
 
 function resetSlot() {
   firstSymbols = [];
@@ -55,7 +89,7 @@ function startSlot() {
               slots[i].textContent = thirdSymbols[Math.floor(Math.random() * thirdSymbols.length)];
               break;
           }
-      }, 40);
+      }, 20);
     }
   }
 }
@@ -72,27 +106,40 @@ function stopSlot(reelIndex) {
       tadah.currentTime = 0;
       tadah.play();
       timpani.pause();
+
+      // const currentNum = `${slots[0].textContent}${slots[1].textContent}${slots[2].textContent}`;
+      const currentNum =   
+        String(slots[0].textContent).padStart(1, '0') +
+        String(slots[1].textContent).padStart(1, '0') +
+        String(slots[2].textContent).padStart(1, '0');
+      usedNumbers.add(currentNum);
+
+      console.log(usedNumbers);
     }
     
     // 10の位の数値範囲を再設定
     if(reelIndex === 0) {
       const firstDigit = parseInt(slots[0].textContent);
 
-      secondSymbols = [];
+      const validtens = getValidTens(firstDigit);
       const maxTens = (firstDigit === hundredsPlace) ? tensPlace : 9;
-      for(let i = 0; i <= maxTens; i++) {
-        secondSymbols.push(i);
-      }
+      
+      secondSymbols = validtens.filter(t => t <= maxTens);
     }
       // 1の位の数値範囲を再設定
       if(reelIndex === 1) {
-        const firstDigit = parseInt(slots[0].textContent);
+        const firstText = slots[0].textContent;
+        const firstDigit = firstText ? parseInt(firstText) : 0;
         const secondDigit = parseInt(slots[1].textContent);
   
+        const excludedUnits = getExcludedUnits(firstDigit, secondDigit);
+
         thirdSymbols = [];
         const maxUnit = (firstDigit === hundredsPlace && secondDigit === tensPlace) ? onesPlace : 9;
         for(let i = 0; i <= maxUnit; i++) {
-          thirdSymbols.push(i);
+          if(!excludedUnits.includes(i)) {
+            thirdSymbols.push(i);
+          }
         }
       }
   }
