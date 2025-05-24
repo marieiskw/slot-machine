@@ -22,7 +22,21 @@ let tensPlace = Math.floor((people % 100) / 10);
 let onesPlace = Math.floor(people % 10);
 
 // 既出の当選番号
-const usedNumbers = new Set(['000']);
+let usedNumbers = new Set(['000']);
+
+// ローカルストレージの情報を取り出す
+const savedNumbers = localStorage.getItem('usedNumbers');
+if(savedNumbers) {
+  try {
+    const parsed = JSON.parse(savedNumbers);
+    if (Array.isArray(parsed)) {
+      parsed.forEach(num => usedNumbers.add(num));
+    }
+  } catch (e) {
+    console.error('ERROR', e);
+  }
+}
+console.log(usedNumbers);
 
 // 重複チェック用
 function getExcludedUnits(firstDigit, secondDigit) {
@@ -107,14 +121,15 @@ function stopSlot(reelIndex) {
       tadah.play();
       timpani.pause();
 
-      // const currentNum = `${slots[0].textContent}${slots[1].textContent}${slots[2].textContent}`;
+      // const currentNum = ${slots[0].textContent}${slots[1].textContent}${slots[2].textContent};
       const currentNum =   
         String(slots[0].textContent).padStart(1, '0') +
         String(slots[1].textContent).padStart(1, '0') +
         String(slots[2].textContent).padStart(1, '0');
       usedNumbers.add(currentNum);
 
-      console.log(usedNumbers);
+      // ローカルストレージに保存
+      localStorage.setItem('usedNumbers', JSON.stringify(Array.from(usedNumbers)));
     }
     
     // 10の位の数値範囲を再設定
