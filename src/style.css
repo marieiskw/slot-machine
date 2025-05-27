@@ -1,9 +1,13 @@
 body {
-  /* background-color: #848484be; */
+  background-color: #fffc3ebe;
   padding: 40px;
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.empty-container {
+  height: 650px;
 }
 
 .container {
