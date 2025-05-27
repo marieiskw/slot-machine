@@ -28,7 +28,7 @@ body {
   display: flex;
   justify-content: center;
   background-color: #fff;
-  color: red;
+  color: rgb(255, 0, 0);
   margin: 20px;
   padding-top: 0;
   padding-bottom: 30px;
@@ -71,7 +71,7 @@ body {
   height: 90px;
   border-radius: 70% / 180% 180% 0 0;
   background: rgb(112, 103, 103);
-  color: red;
+  color: rgb(243, 245, 243);
   /* align-items: baseline; */
   font-size: 30px;
   padding-top: 20px;
