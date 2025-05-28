@@ -117,7 +117,7 @@ function startSlot() {
               thirdSymbols[Math.floor(Math.random() * thirdSymbols.length)];
             break;
         }
-      }, 150);
+      }, 20);
     }
   }
 }
